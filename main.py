@@ -14,15 +14,15 @@ DATA_FILE = "secure_data.json"
 
 # ===== Load or Initialize Users =====
 if os.path.exists(USERS_FILE):
-    with open(USERS_FILE, "r") as f:
-        USER_CREDENTIALS = json.load(f)
+    with open(USERS_FILE, "r") as file:
+        USER_CREDENTIALS = json.load(file)
 else:
     USER_CREDENTIALS = {}
 
 # ===== Load or Initialize Stored Data =====
 if os.path.exists(DATA_FILE):
-    with open(DATA_FILE, "r") as f:
-        stored_data = json.load(f)
+    with open(DATA_FILE, "r") as file:
+        stored_data = json.load(file)
 else:
     stored_data = {}
 
@@ -40,7 +40,7 @@ if "page" not in st.session_state:
 
 # ===== Password Hashing Function =====
 def hash_password(password):
-    salt = b'static_salt'  # Can use random salt for next-level
+    salt = b'static_salt_hahahaha'  # Can use random salt for next-level
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=32,
@@ -63,7 +63,7 @@ def generate_key(passkey, salt):
 
 # ===== Insert Data =====
 def insert_data(user, text, passkey):
-    salt = os.urandom(16)
+    salt = os.urandom(16) # Random salt
     key = generate_key(passkey, salt)
     fernet = Fernet(key)
     encrypted_text = fernet.encrypt(text.encode()).decode()
@@ -73,8 +73,8 @@ def insert_data(user, text, passkey):
         "salt": base64.b64encode(salt).decode()
     }
 
-    with open(DATA_FILE, "w") as f:
-        json.dump(stored_data, f)
+    with open(DATA_FILE, "w") as file:
+        json.dump(stored_data, file)
 
 # ===== Retrieve Data =====
 def retrieve_data(user, passkey):
@@ -117,8 +117,8 @@ def register_user(username, password):
     USER_CREDENTIALS[username] = {
         "password": hash_password(password)
     }
-    with open(USERS_FILE, "w") as f:
-        json.dump(USER_CREDENTIALS, f)
+    with open(USERS_FILE, "w") as file:
+        json.dump(USER_CREDENTIALS, file)
     return True, "✅ Registration successful."
 
 # ===== UI Streamlit Section =====
@@ -169,7 +169,7 @@ def home_page():
         st.session_state.is_authenticated = False
         st.session_state.page = "login"
 
-# ===== Insert Page =====
+# ===== Insert_Data Page =====
 def insert_page():
     st.title("🔐 Insert Secure Data")
     text = st.text_area("Enter text to encrypt")
@@ -180,7 +180,7 @@ def insert_page():
     if st.button("🔙 Back to Home"):
         st.session_state.page = "home"
 
-# ===== Retrieve Page =====
+# ===== Retrieve_Data Page =====
 def retrieve_page():
     st.title("🔓 Retrieve Data")
     passkey = st.text_input("Enter your passkey", type="password")
@@ -189,7 +189,7 @@ def retrieve_page():
     if st.button("🔙 Back to Home"):
         st.session_state.page = "home"
 
-# ===== Router =====
+# ===== Router/Navigator =====
 if not st.session_state.is_authenticated:
     login_page()
 else:
